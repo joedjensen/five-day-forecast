@@ -19,7 +19,7 @@
                 <header class="p-3">
                     <div class="row">
                         <div class="col-3"></div>
-                        <div class="col-9">Weather Forecast</div>
+                        <h1 class="col-9">Weather Forecast</h1>
                     </div>
                 </header>
             </div>
@@ -29,7 +29,7 @@
                 <div class="col-3">
                     <form>
                         <div class="form-group">
-                            <input type="text" class="form-control" id="inputPassword2" placeholder="SanDiego">
+                            <input type="text" class="form-control" id="inputPassword2" placeholder="San Diego">
                         </div>
                         <button type="submit" class="btn btn-primary col-12 ">Search</button>
                     </form>
@@ -38,12 +38,12 @@
                 </div>
                 <div class="col-9">
                     <div class="col-10">
-                        <div class="row">
+                        <div class="row form-group">
 
-                            <div class="card col-12">mroe contrent</div>
+                            <div class="card col-12 my-10" id ="today">mroe contrent</div>
                         </div>
-                        <div class="row justify-content-between">
-                            <div class="card col-2">content</div>
+                        <div class="row justify-content-between " id = "5-day">
+                            <div class="card col-2"><img src ='http://openweathermap.org/img/wn/10d@2x.png' width = "50"></div>
                             <div class="card col-2">content</div>
                             <div class="card col-2">content</div>
                             <div class="card col-2">content</div>
@@ -60,6 +60,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.5/dayjs.min.js"></script>
     <script src="./assets/js/script.js"></script>
 </body>
 
