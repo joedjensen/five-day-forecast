@@ -79,7 +79,6 @@ function fetchFromApi(event) {
                     return response.json();
                 })
                 .then(function (data) {
-                    console.log(data)
                     populateWeatherObject5Day(data)
                     populate5day(cityObject)
                     if (!(data.city.name in cityHistory)) {
