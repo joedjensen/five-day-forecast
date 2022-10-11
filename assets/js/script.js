@@ -109,8 +109,8 @@ function fetchFromApi(event) {
     function populateWeatherObject5Day(fiveDayResponse) {
         var array = []
         for (i = 1; i < fiveDayResponse.list.length; i++) {
-            if (i % 8 == 4) {
-                array[Math.floor(i / 8)] = parseDailyData(fiveDayResponse.list[i])
+            if (dayjs.unix(fiveDayResponse.list[i].dt).hour() in [11, 12, 13]) {
+                array.push(parseDailyData(fiveDayResponse.list[i]))
             }
         }
         cityObject['fiveDay'] = array
