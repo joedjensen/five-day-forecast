@@ -1,47 +1,119 @@
-
 var todayEl = $("#today")
+var searchTextEl = $("#search-text")
+var searchBtnEl = $("#search-btn")
+var buttonListEl = $("#button-list")
+var cityHistory = {};
 
 
-fetch('https://api.openweathermap.org/data/2.5/forecast?q=Peekskill&units=imperial&appid=392099826df334ba983729313c628cd7')
-.then(function (response) {
-    return response.json();
-})
-.then(function (data) {
-    // console.log(data.results);
-    console.log(data)
-    populateToday(data)
-    populate5day(data)
-});
+if (localStorage.getItem("city-history")) {
+    cityHistory = JSON.parse(localStorage.getItem("city-history"))
+    for (const city in cityHistory) {
+        addButtonToList(city)
+    }
+}
 
-function populateToday (weatherObject) {
+function parseDailyData(dailyData) {
+    var dailyObject = {
+        date: dayjs.unix(dailyData.dt).format('(MM/DD/YYYY)'),
+        iconLink: dailyData.weather[0].icon,
+        temp: dailyData.main.temp,
+        windSpeed: dailyData.wind.speed,
+        humidity: dailyData.main.humidity
+    }
+    return dailyObject
+}
+
+function populateToday(cityObject) {
     todayEl.empty()
+    populateElement(todayEl, cityObject.today)
+}
+
+function populate5day(cityObject) {
+    var fiveDayEl = $('#5-day')
+    fiveDayEl.empty()
+    for (i = 0; i < cityObject.fiveDay.length; i++) {
+        var dayEl = $("<div>", { "class": "card col-2" })
+        populateElement(dayEl, cityObject.fiveDay[i])
+        fiveDayEl.append(dayEl)
+    }
+}
+
+function populateElement(element, dailyObject) {
     var headerEl = $("<h2>")
     var tempEl = $('<p>')
     var windEl = $('<p>')
     var humidityEl = $('<p>')
-    headerEl.html(weatherObject.city.name + ' ' + dayjs.unix(weatherObject.list[0].dt).format('(MM/DD/YYYY)') + '<img src =\'http://openweathermap.org/img/wn/10d@2x.png\' width = "50">')
-    tempEl.html("Temp: " + weatherObject.list[0].main.temp + " &#8457")
-    windEl.text("Wind Speed: " + weatherObject.list[0].wind.speed + " mph")
-    humidityEl.html("Humidity: "  + weatherObject.list[0].main.humidity + "&#x25")
-    todayEl.append(headerEl, tempEl, windEl, humidityEl)
+    if (dailyObject.cityName) {
+        headerEl.html(dailyObject.cityName + ' ' + dailyObject.date + '<img src =\'http://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "50">')
+    }
+    else {
+        headerEl.html(dailyObject.date + '<img src =\'http://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "30">')
+    }
+    tempEl.html("Temp: " + dailyObject.temp + " &#8457")
+    windEl.text("Wind Speed: " + dailyObject.windSpeed + " mph")
+    humidityEl.html("Humidity: " + dailyObject.humidity + "&#x25")
+    element.append(headerEl, tempEl, windEl, humidityEl)
 }
 
-function populate5day(weatherObject) {
-    var fiveDayEl = $('#5-day')
-    fiveDayEl.empty()
-    for (i=1; i<weatherObject.list.length; i++) {
-        if (i % 8 ==0) {
-            var dayEl = $("<div>", {"class" : "card col-2"})
-            var headerEl = $("<h6>")
-            var tempEl = $('<p>')
-            var windEl = $('<p>')
-            var humidityEl = $('<p>')
-            headerEl.html(dayjs.unix(weatherObject.list[i].dt).format('(MM/DD/YYYY)') + '<img src =\'http://openweathermap.org/img/wn/10d@2x.png\' width = "30">')
-            tempEl.html("Temp: " + weatherObject.list[i].main.temp + " &#8457")
-            windEl.text("Wind Speed: " + weatherObject.list[i].wind.speed + " mph")
-            humidityEl.html("Humidity: "  + weatherObject.list[i].main.humidity + "&#x25")
-            dayEl.append(headerEl, tempEl, windEl, humidityEl)
-            fiveDayEl.append(dayEl)
+searchBtnEl.on("click", fetchFromApi)
+
+function fetchFromApi(event) {
+    var cityObject = {}
+    event.preventDefault()
+    fetch('https://api.openweathermap.org/data/2.5/weather?q=' + searchTextEl.val() + '&units=imperial&appid=392099826df334ba983729313c628cd7')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            populateWeatherObjectDaily(data)
+            populateToday(cityObject)
+        });
+    fetch('https://api.openweathermap.org/data/2.5/forecast?q=' + searchTextEl.val() + '&units=imperial&appid=392099826df334ba983729313c628cd7')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            populateWeatherObject5Day(data)
+            populate5day(cityObject)
+            if (!(data.city.name in cityHistory)) {
+                addButtonToList(data.city.name)
+            }
+            cityHistory[data.city.name] = cityObject;
+            localStorage.setItem("city-history", JSON.stringify(cityHistory))
+            cityHistory = JSON.parse(localStorage.getItem("city-history"))
+        });
+
+    function populateWeatherObjectDaily(dailyResponse) {
+        cityObject['today'] = parseDailyData(dailyResponse)
+        cityObject['today']['cityName'] = dailyResponse.name
+    }
+
+    function populateWeatherObject5Day(fiveDayResponse) {
+        var array = []
+        for (i = 1; i < fiveDayResponse.list.length; i++) {
+            if (i % 8 == 4) {
+                array[Math.floor(i / 8)] = parseDailyData(fiveDayResponse.list[i])
+            }
         }
+        cityObject['fiveDay'] = array
     }
-    }
+}
+
+function addButtonToList(name) {
+    var buttonEl = $("<button>", { "class": "btn btn-secondary col-12 my-1" })
+    buttonEl.text(name)
+    buttonEl.attr("data-city-name", name)
+    buttonListEl.prepend(buttonEl)
+}
+
+function fetchFromLocal(event) {
+    console.log("fetching")
+    cityHistory = JSON.parse(localStorage.getItem("city-history"))
+    console.log(cityHistory)
+    var cityObject = cityHistory[$(this).attr("data-city-name")]
+    populateToday(cityObject)
+    populate5day(cityObject)
+}
+
+buttonListEl.on("click", "button", fetchFromLocal)
+
