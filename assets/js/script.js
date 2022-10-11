@@ -39,7 +39,7 @@ function populate5day(cityObject) {
     var fiveDayEl = $('#5-day')
     fiveDayEl.empty()
     for (i = 0; i < cityObject.fiveDay.length; i++) {
-        var dayEl = $("<div>", { "class": "five-day-card card col-2 bg-dark text-white" })
+        var dayEl = $("<div>", { "class": "five-day-card card col-2 text-white" })
         populateElement(dayEl, cityObject.fiveDay[i])
         fiveDayEl.append(dayEl)
     }
@@ -51,13 +51,13 @@ function populateElement(element, dailyObject) {
     var windEl = $('<p>')
     var humidityEl = $('<p>')
     if (dailyObject.cityName) {
-        headerEl.html(dailyObject.cityName + ' (' + dailyObject.date + ')<img src =\'http://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "50">')
+        headerEl.html(dailyObject.cityName + ' (' + dailyObject.date + ')<img src =\'https://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "50">')
     }
     else {
-        headerEl.html(dailyObject.date + '<img src =\'http://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "30">')
+        headerEl.html(dailyObject.date + '<img src =\'https://openweathermap.org/img/wn/' + dailyObject.iconLink + '@2x.png\' width = "50">')
     }
     tempEl.html("Temp: " + dailyObject.temp + " &#8457")
-    windEl.text("Wind Speed: " + dailyObject.windSpeed + " mph")
+    windEl.text("Wind: " + dailyObject.windSpeed + " mph")
     humidityEl.html("Humidity: " + dailyObject.humidity + "&#x25")
     element.append(headerEl, tempEl, windEl, humidityEl)
 }
@@ -79,6 +79,7 @@ function fetchFromApi(event) {
                     return response.json();
                 })
                 .then(function (data) {
+                    console.log(data)
                     populateWeatherObject5Day(data)
                     populate5day(cityObject)
                     if (!(data.city.name in cityHistory)) {
@@ -108,8 +109,9 @@ function fetchFromApi(event) {
 
     function populateWeatherObject5Day(fiveDayResponse) {
         var array = []
-        for (i = 1; i < fiveDayResponse.list.length; i++) {
-            if (dayjs.unix(fiveDayResponse.list[i].dt).hour() in [11, 12, 13]) {
+        for (i = 0; i < fiveDayResponse.list.length; i++) {
+            var hour = dayjs.unix(fiveDayResponse.list[i].dt).hour()
+            if (i % 8 == 7) {
                 array.push(parseDailyData(fiveDayResponse.list[i]))
             }
         }

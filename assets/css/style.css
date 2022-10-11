@@ -3,8 +3,13 @@ header {
     color : White;
 }
 
+
+.five-day-card {
+    background-color: #465AB8;
+}
 .five-day-card h2 {
     font-size: large;
     font-weight: bold;
     margin-top: 10px;
+;
 }
