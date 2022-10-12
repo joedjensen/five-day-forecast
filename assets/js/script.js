@@ -39,7 +39,7 @@ function populate5day(cityObject) {
     var fiveDayEl = $('#5-day')
     fiveDayEl.empty()
     for (i = 0; i < cityObject.fiveDay.length; i++) {
-        var dayEl = $("<div>", { "class": "five-day-card card col-2 text-white" })
+        var dayEl = $("<div>", { "class": "five-day-card card text-white" })
         populateElement(dayEl, cityObject.fiveDay[i])
         fiveDayEl.append(dayEl)
     }
@@ -95,7 +95,10 @@ function fetchFromApi(event) {
                     localStorage.setItem("city-history", JSON.stringify(cityHistory))
                     cityHistory = JSON.parse(localStorage.getItem("city-history"))
                     resultsEl.show()
-                });
+                })        
+                .catch(function () {
+                    alert("City \""+searchTextEl.val() + "\" not found")
+                });;
         })
         .catch(function () {
             alert("City \""+searchTextEl.val() + "\" not found")
