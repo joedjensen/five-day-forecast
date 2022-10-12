@@ -39,7 +39,7 @@ function populate5day(cityObject) {
     var fiveDayEl = $('#5-day')
     fiveDayEl.empty()
     for (i = 0; i < cityObject.fiveDay.length; i++) {
-        var dayEl = $("<div>", { "class": "five-day-card card text-white" })
+        var dayEl = $("<div>", { "class": "five-day-card col-md-5 col-lg-2 col-sm-10 card text-white" })
         populateElement(dayEl, cityObject.fiveDay[i])
         fiveDayEl.append(dayEl)
     }

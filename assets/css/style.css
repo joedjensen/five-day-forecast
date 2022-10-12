@@ -6,7 +6,8 @@ header {
 
 .five-day-card {
     background-color: #465AB8;
-    padding: 5px
+    padding: 5px;
+    margin-bottom: 5px;
 }
 .five-day-card h2 {
     font-size: large;
